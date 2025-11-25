@@ -45,6 +45,16 @@ Implementation of the OFMUP algorithm from the AAAI 2026 paper "Fair Algorithms 
 2. **Fair assignment crucial**: Both fair algorithms achieve sublinear regret
 3. **Agent-specific policies essential**: Random assignment leads to linear regret
 
+## 🔗 Related Work
+
+For related baselines and datasets, please refer to our related papers:
+
+1. **Xu, T., Chen, Y., Li, H., Bian, Z., Dall'Anese, E., Zheng, Z.** Online Learning with Probing for Sequential User-Centric Selection. *European Conference on Artificial Intelligence (ECAI)*, 2025.
+
+2. **Xu, T., Zhang, D., & Zheng, Z.** Online Learning for Adaptive Probing and Scheduling in Dense WLANs. *IEEE International Conference on Computer Communications (INFOCOM)*, 2023.
+
+3. **Xu, T., Zhang, D., Pathak, P. H., & Zheng, Z.** Joint AP Probing and Scheduling: A Contextual Bandit Approach. *IEEE Military Communications Conference (MILCOM)*, Nov. 2021.
+
 ## 📚 Citation
 
 ```bibtex
