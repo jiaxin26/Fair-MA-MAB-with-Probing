@@ -266,7 +266,7 @@ def online_fair_multiagent_ucb_with_probing(
         alpha_val = alpha_func(len(S_t))
 
         # Line 14: Policy Optimization
-        # 根据Algorithm 2 Line 14: π ← arg max E_Rt[NSW(St, Rt, Ut, π)]
+        # According to Algorithm 2 Line 14: π ← arg max E_Rt[NSW(St, Rt, Ut, π)]
         pi_per_agent = []
         for j in range(N):
             # Agent j selects arm with highest UCB
@@ -320,8 +320,8 @@ def online_fair_multiagent_ucb_with_probing(
             greedy_nsw *= best_reward
         greedy_nsw = greedy_nsw ** (1.0 / N)
 
-        # 根据Theorem 1，optimal至多是greedy的某个倍数
-        # 使用0.85作为合理的approximation (greedy可能略高估optimal)
+        # According to Theorem 1, optimal is at most a constant multiple of greedy
+        # Use 0.85 as a reasonable approximation (greedy may slightly overestimate optimal)
         approx_optimal = 0.85 * greedy_nsw
 
         # Current NSW vs approximated optimal
