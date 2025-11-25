@@ -19,59 +19,83 @@ def piecewise_linear_nojump(x, breakpoints, slopes, intercepts):
 
 def scenario_aggregator(S, scenario, k):
     """
-    Compute g_k^{(scenario)}(S).
-    'scenario' includes {X_{m,k}, N_m} for all arms m, players k.
-
-    For demonstration, let's assume:
-      g_k^{(scenario)}(S) = sum_{m in S} min(X_{m,k}^{(scenario)}, someLimit)
-    or you might have a resource-based partial allocation logic.
-
-    This function must be submodular in S. For a simple example, a linear sum:
-      g_k^{(scenario)}(S) = sum_{m in S} scenario["X"][m][k]
-
-    Adjust to your real setting.
-    """
-    # Example: X_{m,k} is stored as scenario["X"][m][k]
-    total = 0.0
-    for m in S:
-        total += scenario["X"][m][k]
-    return total
-
-
-def scenario_value_hprob(S, scenario, K, phi_functions):
-    """
-    For a single scenario, define h^{(scenario)}(S) = sum_k phi_k(g_k^{(scenario)}(S)).
-    This yields the scenario's submodular reward w.r.t S if each phi_k o g_k^{(scenario)}
-    is submodular (which typically holds if g_k^{(scenario)} is monotone submodular
-    and phi_k is nondecreasing piecewise linear).
-    """
-    val = 0.0
-    for k in range(K):
-        g_val = scenario_aggregator(S, scenario, k)
-        val += phi_functions[k](g_val)
-    return val
-
-
-def f_prob_with_samples_piecewise_upper(S, scenarios, K, phi_functions):
-    """
-    This is our "offline f_prob" that sums/averages over all random realizations.
-
-    f_prob(S) = (1/|scenarios|) * sum_{scenario in scenarios} h_prob(S, scenario)
-              = E_scenario[ sum_k phi_k( g_k^{(scenario)}(S) ) ].
-
-    If each phi_k(g_k^{(scenario)}(S)) is submodular in S, the average remains submodular.
+    Compute g_k^{(scenario)}(S) - optimal reward for agent k from PROBED arms in S.
 
     Parameters
     ----------
-    S : a set of arms
-    scenarios : list of scenario dicts, each scenario has random draws for X_{m,k}, N_m, etc.
-    K : number of players (or "plays").
-    phi_functions : list of callables [phi_0, ..., phi_{K-1}] to handle piecewise bounding.
+    S : set of int
+        Probing set (arms being probed)
+    scenario : dict
+        Scenario with random reward realizations, scenario["X"][m][k]
+    k : int
+        Agent index
 
     Returns
     -------
     float
-        The average submodular value across all scenarios.
+        Best reward agent k can get from arms in S
+    """
+    if len(S) == 0:
+        return 0.0
+
+    # Greedy: agent k selects the best arm from S
+    best_reward = max(scenario["X"][m][k] for m in S)
+    return best_reward
+
+
+def scenario_value_hprob(S, scenario, K, phi_functions):
+    """
+    For a single scenario, compute g(S) - NSW over probed arms.
+
+    Returns NSW itself.
+
+    Parameters
+    ----------
+    S : set of int
+        Probing set
+    scenario : dict
+        Single scenario
+    K : int
+        Number of agents
+    phi_functions : list of callables
+        Not used anymore (kept for compatibility)
+
+    Returns
+    -------
+    float
+        NSW (geometric mean) for this scenario
+    """
+    # Compute NSW = geometric mean of rewards
+    prod_val = 1.0
+    eps = 1e-9
+    for k in range(K):
+        g_val = scenario_aggregator(S, scenario, k)  # Only probed arms, normalized
+        prod_val *= max(g_val, eps)
+
+    # Geometric mean
+    nsw = prod_val ** (1.0 / K)
+    return nsw
+
+
+def f_prob_with_samples_piecewise_upper(S, scenarios, K, phi_functions):
+    """
+    Compute g(S) - average NSW over PROBED arms only.
+
+    Parameters
+    ----------
+    S : set of int
+        Probing set (arms to probe)
+    scenarios : list of dict
+        Random scenarios, each with reward realizations scenario["X"][m][k]
+    K : int
+        Number of agents
+    phi_functions : list of callables
+        Not used anymore (kept for compatibility)
+
+    Returns
+    -------
+    float
+        g(S) - average NSW over probed arms
     """
     total_val = 0.0
     for scenario in scenarios:

@@ -3,10 +3,7 @@ from itertools import combinations
 
 def compute_realNSW_in_scenario(S, scenario, K, aggregator_func, eps=1e-9):
     """
-    Compute NSW for a single scenario:
-    - Calculate utility per user k using aggregator_func(S, scenario, k)
-    - Take product of utilities
-    - Returns 0 if any utility is too small
+    Compute NSW for a single scenario
     """
     prod_val = 1.0
     for k in range(K):
@@ -14,7 +11,6 @@ def compute_realNSW_in_scenario(S, scenario, K, aggregator_func, eps=1e-9):
         if val_k < eps:
             return 0.0   # Return 0 if utility is too small
         prod_val *= val_k
-    # Geometric mean
     return prod_val ** (1.0 / K)
 
 def avg_realNSW(S, scenarios, K, aggregator_func, eps=1e-9):
